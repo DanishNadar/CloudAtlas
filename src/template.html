@@ -1,0 +1,36 @@
+<title>Cloud Atlas</title>
+<link rel="icon" type="image/svg+xml" href="__ICON__">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+/*__CSS__*/
+</style>
+<div id="app">
+  <header class="bar top">
+    <div class="brand" aria-label="Cloud Atlas"><span class="mark" aria-hidden="true"></span>CLOUD ATLAS</div>
+    <nav id="secnav" class="secnav" aria-label="Sections"></nav>
+    <div class="bar-r">
+      <div class="seg" role="group" aria-label="Depth"><button class="btn" type="button" data-mode="explore">Explore</button><button class="btn" type="button" data-mode="engineer">Engineer</button></div>
+      <button class="btn" id="btnCheck" type="button">Check</button>
+      <button class="btn" id="btnGrid" type="button">Chapters</button>
+      <button class="btn" id="btnNotes" type="button" aria-pressed="false">Notes</button>
+      <button class="btn hide-sm" id="btnPres" type="button">Presenter</button>
+      <button class="btn primary" id="btnPresent" type="button" aria-pressed="false">Present</button>
+    </div>
+  </header>
+  <div class="crumbbar"><span id="crumb"></span><span id="progTxt" class="mono"></span></div>
+  <main id="stage"></main>
+  <footer class="bar foot">
+    <button class="btn" id="prev" type="button" aria-label="Previous scene">Prev</button>
+    <div class="prog" aria-hidden="true"><div id="progFill"></div></div>
+    <span id="count" class="mono"></span>
+    <button class="btn primary" id="next" type="button" aria-label="Next scene">Next</button>
+  </footer>
+  <aside id="notes" hidden aria-label="Presenter notes"></aside>
+  <div id="grid" hidden></div>
+  <div id="kc" hidden></div>
+</div>
+<script>
+/*__JS__*/
+</script>
