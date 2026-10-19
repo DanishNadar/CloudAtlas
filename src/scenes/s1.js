@@ -21,7 +21,7 @@ scene({
   html: `
   <div class="split" style="grid-template-columns:minmax(300px,0.95fr) minmax(0,2fr)">
     <div class="rail" style="justify-content:center">
-      <div class="kicker">Cloud Atlas · From the internet to intelligent infrastructure</div>
+      <div class="kicker">Prologue · follow one request end to end</div>
       <h1 class="hero-title">What actually happens when you <em>open a website?</em></h1>
       <p class="hero-sub">Follow one request for <b>pixelpost.app</b>, a photo-sharing app we will grow all the way into an AI product.</p>
       <div class="urlbar" aria-label="Address bar"><span class="lock">●</span><span id="url"></span><span class="caret"></span></div>

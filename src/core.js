@@ -22,7 +22,7 @@
 
   U.tok = el => {
     const cs = getComputedStyle(el || document.body); const g = n => cs.getPropertyValue('--' + n).trim();
-    const t = {}; ['bg', 'bg2', 'panel', 'line', 'grid', 'fg', 'muted', 'dim', 'blue', 'cyan', 'red', 'amber', 'green', 'violet'].forEach(k => t[k] = g(k));
+    const t = {}; ['bg', 'bg2', 'panel', 'line', 'grid', 'fg', 'muted', 'dim', 'blue', 'cyan', 'red', 'amber', 'green', 'violet', 'yellow', 'accent', 'aws', 'azure', 'gcp'].forEach(k => t[k] = g(k));
     t.mono = "500 12px 'JetBrains Mono', ui-monospace, monospace";
     t.monoS = "500 11px 'JetBrains Mono', ui-monospace, monospace";
     t.monoB = "600 13px 'JetBrains Mono', ui-monospace, monospace";
@@ -151,6 +151,15 @@
       const t = U.svg('text', { x: 0, y: n.sub ? -3 : 5, class: 'fnt' }, g); t.textContent = n.label;
       if (n.sub) { const s = U.svg('text', { x: 0, y: 14, class: 'fns' }, g); s.textContent = n.sub; }
       if (n.icon) { const ic = U.svg('text', { x: -w / 2 + 12, y: -h / 2 + 15, class: 'fni' }, g); ic.textContent = n.icon; }
+      const gi = n.ic === false || !U.guessIcon ? null : (n.ic ? [n.ic, n.cat || 'compute'] : U.guessIcon(n.label + ' ' + (n.sub || '')));
+      if (gi && U.IC && U.IC[gi[0]] && w >= 80 && h >= 34) {
+        const c = U.CAT[gi[1]] || gi[1];
+        U.svg('path', { d: `M${-w / 2 + 10} ${-h / 2 + 0.8}H${w / 2 - 10}`, style: `stroke:${c}`, class: 'fnbar' }, g);
+        const bg = U.svg('g', { class: 'fnic', transform: `translate(${-w / 2 - 8},${-h / 2 - 9})` }, g);
+        U.svg('rect', { width: 22, height: 22, rx: 6, style: `fill:${c};stroke:none` }, bg);
+        const ig = U.svg('g', { transform: 'translate(3,3) scale(0.6667)', style: 'fill:none;stroke:#fff;color:#fff', 'stroke-width': 2.1, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, bg);
+        ig.innerHTML = U.IC[gi[0]];
+      }
       if (spec.onClick) { g.setAttribute('tabindex', '0'); g.setAttribute('role', 'button'); g.setAttribute('aria-label', n.label); g.style.cursor = 'pointer'; const f = () => spec.onClick(id); g.addEventListener('click', f); g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); f(); } }); }
       N[id] = { ...n, w, h, g };
     });
@@ -220,8 +229,14 @@
 
   /* ---------- shell ---------- */
   const SECTIONS = [
-    ['explore', 'Explore'], ['lab', 'Cloud Lab'], ['studio', 'Architecture Studio'], ['ai', 'AI Infrastructure'], ['career', 'Career Roadmap'], ['reference', 'Reference']
+    ['basics', 'Basics'], ['explore', 'Explore'], ['providers', 'AWS · Azure · GCP'], ['lab', 'Cloud Lab'], ['studio', 'Studio'], ['ai', 'AI Infra'], ['career', 'Careers'], ['reference', 'Reference']
   ];
+  /* ---------- provider theme (also the naming "lens" for provider-aware scenes) ---------- */
+  const cloudHandlers = new Set();
+  U.cloud = () => ['aws', 'azure', 'gcp'].includes(store.cloud) ? store.cloud : 'multi';
+  U.onCloud = fn => { cloudHandlers.add(fn); return () => cloudHandlers.delete(fn); };
+  const applyCloud = () => { document.body.dataset.cloud = U.cloud(); U.$$('[data-cloud-b]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cloudB === U.cloud()))); cloudHandlers.forEach(f => { try { f(U.cloud()); } catch (e) { console.error(e); } }); };
+  U.setCloud = c => { store.cloud = c; U.save(); applyCloud(); };
   const st = { i: 0 };
   let cleanup = null; let sceneModeOff = [];
   const presenter = /^#presenter/.test(location.hash);
@@ -229,7 +244,9 @@
   U.chapterNo = s => s.ch;
 
   function show(idx, broadcast = true) {
-    idx = U.clamp(idx, 0, SCENES.length - 1); st.i = idx; const s = SCENES[idx];
+    idx = U.clamp(idx, 0, SCENES.length - 1);
+    document.body.dataset.dir = Math.abs(idx - st.i) === 1 ? (idx > st.i ? 'fwd' : 'back') : 'jump'; // drives the slide entrance direction
+    st.i = idx; const s = SCENES[idx];
     if (cleanup) { try { cleanup(); } catch (e) { console.error(e); } cleanup = null; }
     sceneModeOff.forEach(f => f()); sceneModeOff = [];
     const stage = U.$('#stage'); stage.innerHTML = '';
@@ -237,7 +254,8 @@
       const sec = document.createElement('section');
       sec.className = 'slide' + (s.paper ? ' paper' : '') + (s.ai ? ' ai' : '') + (s.cls ? ' ' + s.cls : '');
       sec.setAttribute('aria-label', s.title);
-      const head = s.bare ? '' : `<header class="sh">
+      const em = s.ic || (U.SCENE_IC && U.SCENE_IC[s.id]);
+      const head = s.bare ? '' : `<header class="sh${em ? ' has-em' : ''}">${em ? `<div class="emblem" style="--c:${U.CAT[em[1]] || em[1] || 'var(--accent)'}">${U.icon(em[0])}</div>` : ''}
           <div class="kicker">${s.ch != null ? `Chapter ${s.ch} · ` : ''}${s.kicker || ''}</div>
           <h2>${s.title}</h2>
           ${s.objectives ? `<details class="obj"><summary>What you'll learn</summary><ul>${s.objectives.map(o => `<li>${o}</li>`).join('')}</ul></details>` : ''}
@@ -245,9 +263,10 @@
       const foot = (s.notice || s.myth) ? `<footer class="sf">${s.notice ? `<div class="notice"><span>Look for</span><div>${s.notice}</div></div>` : ''}${s.myth ? `<div class="notice myth"><span>Misconception</span><div>${s.myth}</div></div>` : ''}</footer>` : '';
       sec.innerHTML = head + `<div class="sb">${s.html || ''}</div>` + foot;
       stage.appendChild(sec); stage.scrollTop = 0;
-      const prevOn = U.onMode; U.onMode = fn => { const off = prevOn(fn); sceneModeOff.push(off); return off; };
+      const prevOn = U.onMode, prevC = U.onCloud; U.onMode = fn => { const off = prevOn(fn); sceneModeOff.push(off); return off; };
+      U.onCloud = fn => { const off = prevC(fn); sceneModeOff.push(off); return off; };
       try { cleanup = s.mount ? s.mount(sec.querySelector('.sb'), sec) : null; } catch (e) { console.error('mount failed', s.id, e); }
-      U.onMode = prevOn;
+      U.onMode = prevOn; U.onCloud = prevC;
     }
     store.visited[s.id] = 1; store.last = s.id; U.save();
     chrome(); notes();
@@ -290,8 +309,8 @@
     const list = filter === 'lab' ? SCENES.filter(s => s.lab) : SCENES;
     g.innerHTML = `<div class="gh"><div><h3>${filter === 'lab' ? 'Cloud Lab' : 'All chapters'}</h3><p class="c-muted" style="margin:4px 0 0">${filter === 'lab' ? 'Every interactive experiment, available on its own.' : 'Jump anywhere. Progress is saved in this browser.'}</p></div>
       <div class="controls">${filter === 'lab' ? '<button class="btn" id="gAll">All chapters</button>' : '<button class="btn" id="gLab">Cloud Lab only</button>'}<button class="btn warn" id="gReset">Reset progress</button><button class="btn" id="gClose">Close (Esc)</button></div></div>
-      <ol>${list.map(s => { const k = SCENES.indexOf(s); return `<li class="${k === st.i ? 'cur' : ''}"><button data-id="${s.id}"><span class="gk">${s.ch != null ? 'Chapter ' + s.ch : (s.kicker || '')}${s.lab ? ' · <span class="c-cyan">lab</span>' : ''}</span><span class="gt">${s.short || s.title}</span>${s.lab ? `<span class="gl">${s.lab}</span>` : ''}<span class="gs">${store.visited[s.id] ? '<span class="c-green">visited</span>' : '<span class="c-dim">not yet</span>'}${s.check ? (store.checks[s.id] === true ? ' · <span class="c-green">check passed</span>' : ' · check') : ''}</span></button></li>`; }).join('')}</ol>
-      <div class="help">← → / Space navigate · E Explore/Engineer · K knowledge check · N notes · G chapters · L Cloud Lab · P presenter window · F present full screen</div>`;
+      <ol>${list.map(s => { const k = SCENES.indexOf(s); const em = s.ic || (U.SCENE_IC && U.SCENE_IC[s.id]); return `<li class="${k === st.i ? 'cur' : ''}"><button data-id="${s.id}">${em ? `<span class="gem" style="--c:${U.CAT[em[1]] || em[1]}">${U.icon(em[0])}</span>` : ''}<span class="gk">${s.ch != null ? 'Chapter ' + s.ch : (s.kicker || '')}${s.lab ? ' · <span class="c-cyan">lab</span>' : ''}</span><span class="gt">${s.short || s.title}</span>${s.lab ? `<span class="gl">${s.lab}</span>` : ''}<span class="gs">${store.visited[s.id] ? '<span class="c-green">visited</span>' : '<span class="c-dim">not yet</span>'}${s.check ? (store.checks[s.id] === true ? ' · <span class="c-green">check passed</span>' : ' · check') : ''}</span></button></li>`; }).join('')}</ol>
+      <div class="help">← → / Space navigate · Ctrl K or / search · E Explore/Engineer · K knowledge check · N notes · G chapters · L Cloud Lab · P presenter window · F present full screen · ? all shortcuts</div>`;
     g.querySelector('#gClose').onclick = () => grid(false);
     const gl = g.querySelector('#gLab'), ga = g.querySelector('#gAll');
     if (gl) gl.onclick = () => grid(true, 'lab'); if (ga) ga.onclick = () => grid(true);
@@ -331,6 +350,12 @@
   U.present = present;
 
   function boot() {
+    // scenes may declare `first: true` or `after: '<scene id>'` so new tracks can be woven into the chapter order
+    const moved = SCENES.filter(s => s.first || s.after); moved.forEach(s => SCENES.splice(SCENES.indexOf(s), 1));
+    moved.filter(s => s.first).reverse().forEach(s => SCENES.unshift(s));
+    moved.filter(s => s.after).forEach(s => { const k = SCENES.findIndex(x => x.id === s.after); SCENES.splice(k < 0 ? SCENES.length : k + 1, 0, s); });
+    U.$$('[data-cloud-b]').forEach(b => b.onclick = () => U.setCloud(b.dataset.cloudB));
+    applyCloud();
     if (presenter) { document.body.classList.add('presenter'); toggleNotes(true); }
     const nav = U.$('#secnav');
     SECTIONS.forEach(([k, l]) => { const b = U.btn(nav, l, () => { if (k === 'lab') return grid(true, 'lab'); const s = SCENES.find(x => x.section === k); if (s) U.goId(s.id); }); b.dataset.sec = k; });
