@@ -12,7 +12,7 @@ scene({
       <details class="explain" open><summary style="cursor:pointer;font-weight:600">Policy JSON</summary><pre class="code" id="json" style="margin-top:8px"></pre></details>
     </div>
     <div class="rail">
-      <div class="explain"><h4>The app role "pixelpost-api" makes these calls</h4><p>Only the first four are part of its job.</p></div>
+      <div class="explain"><h4>The app role "Spiron-api" makes these calls</h4><p>Only the first four are part of its job.</p></div>
       <div class="tscroll"><table class="t" id="req"></table></div>
       <div class="tiles" id="tiles"></div>
       <div class="explain" id="why" aria-live="polite"></div>
@@ -74,7 +74,7 @@ scene({
 const IAC = {
   tf: `# Terraform (HCL)
 resource "aws_s3_bucket" "photos" {
-  bucket = "pixelpost-photos"
+  bucket = "Spiron-photos"
 }
 
 resource "aws_s3_bucket_public_access_block" "photos" {
@@ -151,7 +151,7 @@ scene({
       await stage(0, true, 'webhook → pipeline triggered');
       if (!await stage(1, !F.test, F.test ? '✗ 3 of 214 tests failed: test_feed_pagination' : '✓ 214 unit + 18 integration tests passed', 900)) return end('no', 'Stopped at tests', 'Nothing was built or deployed. Production keeps serving v1.9 untouched. The developer gets the failing test names and fixes the code. This is the cheapest place to catch a bug.');
       if (!await stage(2, !F.build, F.build ? '✗ build failed: dependency "imagelib==4.0" not found' : '✓ build complete, 2m 10s')) return end('no', 'Stopped at build', 'No artifact exists, so there is nothing to deploy. Pin dependency versions and cache them so builds are reproducible.');
-      await stage(3, true, '✓ pushed image pixelpost:2.0 (sha256:9c1e…) to the container registry; scanned for known vulnerabilities');
+      await stage(3, true, '✓ pushed image Spiron:2.0 (sha256:9c1e…) to the container registry; scanned for known vulnerabilities');
       state[4] = 'run'; draw();
       const bad = F.config ? 'config' : F.unhealthy ? 'unhealthy' : null;
       if (strat === 'canary') {
@@ -340,7 +340,7 @@ scene({
   html: `
   <div class="split" style="grid-template-columns:minmax(290px,0.85fr) minmax(0,2fr)">
     <div class="rail" style="gap:10px">
-      <p class="lede">Pixelpost must handle <b id="pk">1,200</b> req/s at peak on a monthly budget.</p>
+      <p class="lede">Spiron must handle <b id="pk">1,200</b> req/s at peak on a monthly budget.</p>
       <div class="controls stack" id="ctl"></div>
     </div>
     <div class="col">

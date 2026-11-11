@@ -264,7 +264,7 @@ scene({
     demo: ['Play all six steps on AWS, then switch to Azure and Google Cloud on the last step.'],
     ask: 'Which step would you skip for a personal portfolio site, and which should you never skip?',
     answer: 'Skip sign-in and database if it is static. Never skip HTTPS (via the CDN) and a budget alert.',
-    transition: 'Now let\'s look at the building blocks of a bigger, server-based version of Pixelpost.'
+    transition: 'Now let\'s look at the building blocks of a bigger, server-based version of Spiron.'
   },
   check: { q: 'Why does step 2 put a CDN in front of the storage bucket?', opts: ['Buckets cannot store HTML', 'To cache files near users and serve them over HTTPS with your domain', 'To run the API code', 'Because DNS requires it'], a: 1, why: 'The CDN reduces latency and origin load, terminates HTTPS with a managed certificate and lets the bucket stay private.' }
 });

@@ -106,7 +106,7 @@ scene({
       <div class="viz" style="min-height:140px;flex:0.45"><div class="cvhost" id="ch"></div></div>
     </div>
     <div class="rail">
-      <p class="lede">Pixelpost's origin is in one Region (N. Virginia). A CDN (<span class="pv aws">CloudFront</span>, <span class="pv azure">Front Door</span>, <span class="pv gcp">Cloud CDN</span>) keeps copies at edge locations near users.</p>
+      <p class="lede">Spiron's origin is in one Region (N. Virginia). A CDN (<span class="pv aws">CloudFront</span>, <span class="pv azure">Front Door</span>, <span class="pv gcp">Cloud CDN</span>) keeps copies at edge locations near users.</p>
       <div class="controls" id="on"></div>
       <div class="controls stack" id="ctl"></div>
       <div class="controls" id="btns"></div>
@@ -162,7 +162,7 @@ scene({
     objective: 'Learners understand caching at the edge, TTL trade-offs and the double benefit: speed and origin offload.',
     say: ['Every dot is a request. Green: answered by a nearby edge. Amber: the edge had to fetch from Virginia.', 'Hit ratio climbs as edges warm up. Popular objects are requested often, so they stay cached.', 'Short TTL = fresher content but more misses. Long TTL = fast and cheap, but changes take longer to appear — unless you invalidate.'],
     demo: ['Watch warm-up → Invalidate all caches → TTL 4 s → catalog 5000 + skew 0.5 → CDN off.'],
-    ask: 'Pixelpost updates a user\'s avatar but the old one keeps showing. What happened, and what are two fixes?',
+    ask: 'Spiron updates a user\'s avatar but the old one keeps showing. What happened, and what are two fixes?',
     answer: 'The edge serves a cached copy until the TTL expires. Fix: version the URL (avatar-v2.jpg) or invalidate the path; use short TTLs for frequently changing objects.',
     transition: 'Caches absorb reads. What absorbs bursts of work? Queues.'
   },
@@ -177,7 +177,7 @@ scene({
   html: `
   <div class="split" style="grid-template-columns:minmax(290px,0.9fr) minmax(0,2.1fr)">
     <div class="rail">
-      <p class="lede">Pixelpost resizes every uploaded photo. Instead of making uploads wait, the upload service drops a message on a queue (<span class="pv aws">SQS</span>, <span class="pv azure">Service Bus</span>, <span class="pv gcp">Pub/Sub</span>) and workers process it when they can.</p>
+      <p class="lede">Spiron resizes every uploaded photo. Instead of making uploads wait, the upload service drops a message on a queue (<span class="pv aws">SQS</span>, <span class="pv azure">Service Bus</span>, <span class="pv gcp">Pub/Sub</span>) and workers process it when they can.</p>
       <div id="mode"></div>
       <div class="controls stack" id="ctl"></div>
       <div class="tiles" id="tiles"></div>

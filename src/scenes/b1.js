@@ -14,7 +14,6 @@ scene({
       <h1 class="hero-title">Learn the cloud by <em>watching it work.</em></h1>
       <p class="hero-sub"><span id="nsc"></span> animated scenes and simulators take you from "what is a server?" to designing systems on <span class="pv aws">AWS</span>, <span class="pv azure">Microsoft Azure</span> and <span class="pv gcp">Google Cloud</span> — and running AI on them.</p>
       <div class="controls" id="cta"></div>
-      <p class="c-dim" style="font-size:13.5px;margin:0">No account, credentials or install needed — every lab runs in your browser. Use the theme switch (top right) to view the course in AWS, Azure or Google Cloud colors.</p>
     </div>
     <div class="viz hero-viz"><div class="cvhost" id="sky"></div></div>
   </div>
@@ -105,12 +104,12 @@ scene({
       <div class="split even" style="flex:0 0 auto;gap:12px"><div class="tiles" id="tiles"></div><div class="viz" style="min-height:120px;flex:0 0 120px"><div class="cvhost" id="spark"></div></div></div>
     </div>
   </div>`,
-  notice: 'The orange squares are Pixelpost\'s servers. They appear when its users arrive and are handed back to the shared pool when they leave — and the meter only runs while they exist.',
+  notice: 'The orange squares are Spiron\'s servers. They appear when its users arrive and are handed back to the shared pool when they leave — and the meter only runs while they exist.',
   myth: '"The cloud" is not somewhere abstract. It is physical buildings full of servers, owned by a provider and shared by many customers.',
   mount(el, slide) {
     const k = U.tok(slide);
     const COLS = 10, ROWS = 5, N = COLS * ROWS;
-    const T = [{ id: 'px', name: 'Pixelpost', c: '#FF9900' }, { id: 'shop', name: 'Shop', c: '#3AA0FF' }, { id: 'school', name: 'School', c: '#34A853' }];
+    const T = [{ id: 'px', name: 'Spiron', c: '#FF9900' }, { id: 'shop', name: 'Shop', c: '#3AA0FF' }, { id: 'school', name: 'School', c: '#34A853' }];
     const host = el.querySelector('#pool');
     let cells = ''; for (let i = 0; i < N; i++) { const x = 500 + (i % COLS) * 37, y = 112 + Math.floor(i / COLS) * 46; cells += `<g class="slot" data-i="${i}"><rect x="${x}" y="${y}" width="31" height="38" rx="4"/><rect class="sled" x="${x + 6}" y="${y + 30}" width="19" height="3" rx="1.5"/></g>`; }
     host.innerHTML = `<svg viewBox="0 0 900 430" class="flow" role="img" aria-label="Users connect over the internet to a shared pool of servers in a provider data center">
@@ -129,7 +128,7 @@ scene({
       return { px: Math.max(1, (S.users / 10) * (0.35 + 0.65 * day) * (S.spike > 0 ? 2.2 : 1)) + S.manual, shop: 6 + 7 * Math.max(0, Math.sin(Math.PI * (h - 10) / 14)), school: 1 + 9 * (h >= 8 && h < 16 ? 1 : 0) };
     };
     const ctl = el.querySelector('#ctl');
-    U.slider(ctl, { label: 'Pixelpost users (thousands)', min: 10, max: 160, step: 10, value: S.users, fmt: v => v + 'k' }, v => { S.users = v; });
+    U.slider(ctl, { label: 'Spiron users (thousands)', min: 10, max: 160, step: 10, value: S.users, fmt: v => v + 'k' }, v => { S.users = v; });
     const cb = el.querySelector('#ctl'); const row = document.createElement('div'); row.className = 'controls'; cb.appendChild(row);
     U.btn(row, `${U.icon('rocket')} Launch campaign (traffic ×2 for 4 h)`, () => { S.spike = 4; flash('elastic'); }, 'primary');
     U.btn(row, `${U.icon('gear')} Launch 1 server yourself`, () => { S.manual++; flash('self'); });
@@ -156,7 +155,7 @@ scene({
     };
     let acc = 0, pacc = 0, need = allocate();
     const tiles = el.querySelector('#tiles');
-    const sp = U.canvas(el.querySelector('#spark'), () => { const hs = S.hist; U.chart(sp, { k, x: [0, 48], y: [0, Math.max(10, ...hs.map(h => Math.max(h.d, h.a))) * 1.15], padL: 34, padB: 22, padT: 22, xTicks: 4, yTicks: 2, xFmt: v => '-' + Math.round(48 - v) + 'h', yLabel: 'Pixelpost: needed vs. running servers', series: [{ data: hs.map(h => h.d), color: k.fg, width: 1.5 }, { data: hs.map(h => h.a), color: '#FF9900', step: true, fill: U.a('#FF9900', .12) }] }); });
+    const sp = U.canvas(el.querySelector('#spark'), () => { const hs = S.hist; U.chart(sp, { k, x: [0, 48], y: [0, Math.max(10, ...hs.map(h => Math.max(h.d, h.a))) * 1.15], padL: 34, padB: 22, padT: 22, xTicks: 4, yTicks: 2, xFmt: v => '-' + Math.round(48 - v) + 'h', yLabel: 'Spiron: needed vs. running servers', series: [{ data: hs.map(h => h.d), color: k.fg, width: 1.5 }, { data: hs.map(h => h.a), color: '#FF9900', step: true, fill: U.a('#FF9900', .12) }] }); });
     const stop = U.loop(dt => {
       S.t += dt; acc += dt; pacc += dt * (S.users / 40) * (S.spike > 0 ? 2 : 1);
       if (S.spike > 0) S.spike -= dt;
@@ -175,7 +174,7 @@ scene({
   },
   notes: {
     objective: 'Learners can define cloud computing and point to all five NIST characteristics in a live system.',
-    say: ['One sentence: someone else\'s computers, rented over the internet, on demand, paid by use.', 'Three customers share one pool. Watch the school\'s green servers appear at 8:00 and vanish at 16:00, while the shop peaks in the evening.', 'Launch a campaign: Pixelpost\'s orange squares multiply, then hand back to the pool. The meter only counts while they exist.'],
+    say: ['One sentence: someone else\'s computers, rented over the internet, on demand, paid by use.', 'Three customers share one pool. Watch the school\'s green servers appear at 8:00 and vanish at 16:00, while the shop peaks in the evening.', 'Launch a campaign: Spiron\'s orange squares multiply, then hand back to the pool. The meter only counts while they exist.'],
     demo: ['Click each of the five characteristics; each one highlights the part of the picture it describes.', 'Drag users to 160k to see the pool fill up.'],
     ask: 'Why can a provider offer capacity cheaper than if each customer bought for their own peak?',
     answer: 'Customers peak at different times, so the shared pool needs far less hardware than the sum of everyone\'s peaks (statistical multiplexing).',
@@ -186,7 +185,7 @@ scene({
 
 /* ======================= HOW THE INTERNET MOVES DATA ======================= */
 const NET_N = { you: [55, 250, 'Your laptop', '192.0.2.10'], r1: [175, 250, 'Home router', '192.0.2.1'], r2: [300, 140, 'ISP router A', '198.51.100.1'], r3: [300, 360, 'ISP router B', '198.51.100.9'],
-  r4: [450, 90, 'Backbone 1', ''], r5: [450, 250, 'Backbone 2', ''], r6: [450, 410, 'Backbone 3', ''], r7: [610, 160, 'Exchange point', ''], r8: [610, 340, 'Cloud edge', ''], r9: [740, 250, 'Region router', ''], srv: [855, 250, 'pixelpost.app', '203.0.113.5'] };
+  r4: [450, 90, 'Backbone 1', ''], r5: [450, 250, 'Backbone 2', ''], r6: [450, 410, 'Backbone 3', ''], r7: [610, 160, 'Exchange point', ''], r8: [610, 340, 'Cloud edge', ''], r9: [740, 250, 'Region router', ''], srv: [855, 250, 'Spiron.app', '203.0.113.5'] };
 const NET_L = [['you', 'r1', 2], ['r1', 'r2', 6], ['r1', 'r3', 7], ['r2', 'r4', 9], ['r2', 'r5', 8], ['r3', 'r5', 8], ['r3', 'r6', 10], ['r4', 'r7', 12], ['r5', 'r7', 9], ['r5', 'r8', 11], ['r6', 'r8', 8], ['r7', 'r9', 7], ['r8', 'r9', 5], ['r9', 'srv', 1]];
 scene({
   id: 'internet', after: 'what-is-cloud', section: 'basics', kicker: 'Basics · 2', title: 'How does data travel across the internet?', short: 'Packets & routing', ic: ['router', 'network'],
@@ -241,7 +240,7 @@ scene({
       st = { n: O.n, got: new Set(), order: [], re: 0, ooo: 0, maxSeen: -1 }; flying.forEach(f => f.c.remove()); flying = [];
       reasm.innerHTML = Array.from({ length: O.n }, (_, i) => `<span class="pslot" data-i="${i}">${i + 1}</span>`).join('');
       for (let i = 0; i < O.n; i++) launch(i, i * 0.18);
-      why.innerHTML = `<h4>Sending "Hello from Pixelpost!" as ${O.n} packets</h4><p>Each packet carries the destination 203.0.113.5 and a sequence number. Routers forward each packet independently along the best path they know right now.</p>`;
+      why.innerHTML = `<h4>Sending "Hello from Spiron!" as ${O.n} packets</h4><p>Each packet carries the destination 203.0.113.5 and a sequence number. Routers forward each packet independently along the best path they know right now.</p>`;
       stats();
     }
     function launch(i, delay, isRe) {
@@ -514,7 +513,7 @@ scene({
     demo: ['Press Play; pause on 2006, 2014 and 2022.'],
     ask: 'Which earlier idea from the timeline does serverless computing most resemble?',
     answer: 'Time-sharing and the utility model: you pay only for the time your code actually runs.',
-    transition: 'Back to Pixelpost: if you rent, who is responsible for what?'
+    transition: 'Back to Spiron: if you rent, who is responsible for what?'
   },
   check: { q: 'Which pair of launches in 2006 is usually seen as the start of the modern public cloud?', opts: ['Gmail and YouTube', 'Amazon S3 and Amazon EC2', 'Docker and Kubernetes', 'Azure and App Engine'], a: 1, why: 'AWS opened self-service, pay-as-you-go storage (S3) and virtual servers (EC2) to anyone in 2006.' }
 });

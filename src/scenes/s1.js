@@ -1,12 +1,12 @@
 /* Opening journey · Chapter 1 (why the cloud) · Chapter 2 (responsibility) · Chapter 3 (global infrastructure) */
 
 const JOURNEY_INFO = {
-  browser: ['Your browser', 'The client. It knows a name (pixelpost.app), turns it into an address, opens an encrypted connection, sends HTTP requests and renders what comes back.'],
+  browser: ['Your browser', 'The client. It knows a name (Spiron.app), turns it into an address, opens an encrypted connection, sends HTTP requests and renders what comes back.'],
   resolver: ['DNS resolver', 'Usually run by your ISP or a public DNS service. It looks up names on your behalf and caches answers for their time-to-live (TTL).'],
-  auth: ['Authoritative DNS', 'The source of truth for pixelpost.app records. Here it is Amazon Route 53, which can answer differently by location or health.'],
+  auth: ['Authoritative DNS', 'The source of truth for Spiron.app records. Here it is Amazon Route 53, which can answer differently by location or health.'],
   edge: ['CDN edge location', 'A cache close to users (Amazon CloudFront). It serves copies of files it already has and forwards everything else to the origin.'],
   lb: ['Load balancer', 'Elastic Load Balancing receives requests for the application and spreads them across healthy servers, using health checks to skip broken ones.'],
-  app1: ['Application server', 'Runs Pixelpost\'s code: checks the session, builds the feed and talks to data stores. Could equally be a container or a Lambda function.'],
+  app1: ['Application server', 'Runs Spiron\'s code: checks the session, builds the feed and talks to data stores. Could equally be a container or a Lambda function.'],
   app2: ['Application server', 'A second copy of the same code. Copies let the app handle more traffic and survive one server failing.'],
   db: ['Database', 'Stores structured records: users, posts, likes. Amazon RDS or DynamoDB are typical choices; Chapter 7 compares them.'],
   s3: ['Object storage', 'Amazon S3 stores the photos and static files (images, scripts, styles) as objects addressed by key.'],
@@ -23,7 +23,7 @@ scene({
     <div class="rail" style="justify-content:center">
       <div class="kicker">Prologue · follow one request end to end</div>
       <h1 class="hero-title">What actually happens when you <em>open a website?</em></h1>
-      <p class="hero-sub">Follow one request for <b>pixelpost.app</b>, a photo-sharing app we will grow all the way into an AI product.</p>
+      <p class="hero-sub">Follow one request for <b>Spiron.app</b>, a photo-sharing app we will grow all the way into an AI product.</p>
       <div class="urlbar" aria-label="Address bar"><span class="lock">●</span><span id="url"></span><span class="caret"></span></div>
       <div class="controls" id="opts"></div>
       <div id="stepper"></div>
@@ -72,7 +72,7 @@ scene({
     const steps = () => {
       const path = O.type === 'api' ? '/api/feed' : '/photos/sunset.jpg';
       const s = [
-        { t: 'You type a name', n: ['browser'], h: [], url: 'pixelpost.app' + path,
+        { t: 'You type a name', n: ['browser'], h: [], url: 'Spiron.app' + path,
           e: 'Your browser knows a name, not a location. Computers route traffic to numeric IP addresses, so the name must be translated first.',
           g: 'The browser checks its own DNS cache and the operating system\'s resolver cache before asking the network.' },
         { t: 'DNS: name → address', n: ['resolver', 'auth'], h: [['browser', 'resolver'], ['resolver', 'auth']],
@@ -82,7 +82,7 @@ scene({
           e: 'DNS returns the address of a CDN edge location near you, not of a single faraway server.',
           g: 'CloudFront distributions are reached through DNS records (an alias in Route 53) that resolve to edge addresses chosen to be close to the resolver.' },
         { t: 'Open a secure connection', n: ['browser', 'edge'], h: [['browser', 'edge'], ['edge', 'browser', 'ret']],
-          e: 'Before sending anything private, the browser and the edge agree on encryption and the edge proves it really is pixelpost.app.',
+          e: 'Before sending anything private, the browser and the edge agree on encryption and the edge proves it really is Spiron.app.',
           g: 'TCP handshake (1 round trip) + TLS 1.3 handshake (1 round trip). HTTP/3 runs over QUIC, which combines them. The TLS certificate must match the domain.' },
         { t: 'Send the request', n: ['edge'], h: [['browser', 'edge']],
           e: `The browser sends <code class="k">GET ${path}</code>. The edge decides whether it can answer by itself.`,
@@ -92,7 +92,7 @@ scene({
         s.push({ t: 'Cache hit', n: ['edge'], h: [['edge', 'browser', 'ret']], e: 'The edge already holds a fresh copy of this image, so it answers immediately. The origin servers never see the request.',
           g: 'The response carries an <code class="k">Age</code> header and a cache-status header. Freshness comes from Cache-Control / TTL settings.' });
       } else if (O.type === 'page') {
-        s.push({ t: 'Cache miss → origin', n: ['edge', 's3'], h: [['edge', 's3'], ['s3', 'edge', 'ret']], e: 'The edge doesn\'t have this file yet, so it fetches it from the origin: the S3 bucket holding Pixelpost\'s photos.',
+        s.push({ t: 'Cache miss → origin', n: ['edge', 's3'], h: [['edge', 's3'], ['s3', 'edge', 'ret']], e: 'The edge doesn\'t have this file yet, so it fetches it from the origin: the S3 bucket holding Spiron\'s photos.',
           g: 'With origin access control, only CloudFront may read the bucket; the bucket itself stays private.' });
         s.push({ t: 'Cache and deliver', n: ['edge'], h: [['edge', 'browser', 'ret']], e: 'The edge stores a copy for the next visitor nearby and returns the image to you.', g: 'Subsequent requests in that region become cache hits until the object expires or is invalidated.' });
       } else {
@@ -154,7 +154,7 @@ scene({
   html: `
   <div class="split" style="grid-template-columns:minmax(280px,0.85fr) minmax(0,2.1fr)">
     <div class="rail">
-      <p class="lede">Pixelpost is growing. Do you <b>buy servers</b> and wait for delivery, or <b>rent capacity</b> by the hour?</p>
+      <p class="lede">Spiron is growing. Do you <b>buy servers</b> and wait for delivery, or <b>rent capacity</b> by the hour?</p>
       <div class="controls stack" id="ctl"></div>
       <div class="tiles" id="tiles"></div>
       <div class="explain" id="story" aria-live="polite"></div>

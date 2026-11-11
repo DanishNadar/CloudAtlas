@@ -9,7 +9,7 @@ scene({
       <div class="controls" id="opts"></div>
       <div class="viz grid" style="min-height:300px"><div class="cvhost" id="fl"></div></div>
       <div class="grid2" style="align-items:stretch">
-        <div class="explain"><h4>Pixelpost Assistant</h4><p class="mono" style="font-size:13px;color:var(--fg)">You: How do I reset my password?</p><p id="ans" style="margin-top:6px;color:var(--fg);min-height:3.2em"></p></div>
+        <div class="explain"><h4>Spiron Assistant</h4><p class="mono" style="font-size:13px;color:var(--fg)">You: How do I reset my password?</p><p id="ans" style="margin-top:6px;color:var(--fg);min-height:3.2em"></p></div>
         <div class="explain"><h4>Context window</h4><div id="ctx"></div></div>
       </div>
     </div>
@@ -28,7 +28,7 @@ scene({
       cache: { x: 460, y: 70, label: 'Response cache', sub: 'exact / semantic', w: 160 }, emb: { x: 660, y: 70, label: 'Embedding model', sub: 'text → vector', w: 160, kind: 'ai' }, vec: { x: 860, y: 70, label: 'Vector index', sub: 'top-k search', w: 150 },
       llm: { x: 760, y: 210, label: 'LLM inference', sub: 'GPU servers', w: 170, kind: 'ai', h: 60 }, docs: { x: 860, y: 340, label: 'Documents', sub: 'S3', w: 140 }, mon: { x: 460, y: 340, label: 'Monitoring', sub: 'tokens · latency · cost', w: 170 } };
     const F = U.flow(el.querySelector('#fl'), { size: [960, 400], nodes, edges: [['user', 'gw'], ['gw', 'app'], ['app', 'cache'], ['app', 'emb'], ['emb', 'vec'], ['vec', 'app', 'dash'], ['app', 'llm'], ['app', 'mon'], ['docs', 'vec', 'dash'], ['llm', 'mon', 'dash']], boundaries: [{ x: 570, y: 140, w: 380, h: 140, label: 'MODEL SERVING', kind: 'ai' }], label: 'LLM application architecture' });
-    const ANS = { rag: 'Open Settings → Security → Reset password. We email you a link that stays valid for 30 minutes. If it expires, request a new one. [source: help/account-security.md]', plain: 'I don\'t have Pixelpost-specific instructions, but most apps let you reset a password from the sign-in screen with a "Forgot password?" link.' };
+    const ANS = { rag: 'Open Settings → Security → Reset password. We email you a link that stays valid for 30 minutes. If it expires, request a new one. [source: help/account-security.md]', plain: 'I don\'t have Spiron-specific instructions, but most apps let you reset a password from the sign-in screen with a "Forgot password?" link.' };
     const tok = { sys: 320, q: 12, passage: 380 };
     const ctxBox = el.querySelector('#ctx'); const WIN = 8192;
     const ctx = (show) => { const parts = [['system prompt', tok.sys, 'var(--blue)'], ['question', tok.q, 'var(--cyan)']].concat(O.rag && show ? [['4 retrieved passages', tok.passage * 4, 'var(--violet)']] : []); const used = parts.reduce((s, p) => s + p[1], 0); const out = 60;
@@ -293,7 +293,7 @@ scene({
     U.btn(c, 'Run the pipeline', () => flowRun(false), 'primary'); U.btn(c, 'Simulate data drift', () => flowRun(true), 'warn');
     pick('train');
   },
-  notes: { objective: 'Learners describe the ML lifecycle as a loop with distinct resources and failure modes per stage.', say: ['Most of the work is data: collecting, cleaning and versioning it. Training is one box.', 'Simulate drift: the model didn\'t change — the world did. Monitoring catches it and triggers retraining.'], ask: 'Pixelpost wants photo captions. Bedrock, custom training, or self-hosting?', answer: 'Start with a managed model for speed; train or fine-tune only if quality or cost demands it; self-host only at high, steady volume with a team to run it.', transition: 'Data preparation runs on many machines at once. How does that work?' },
+  notes: { objective: 'Learners describe the ML lifecycle as a loop with distinct resources and failure modes per stage.', say: ['Most of the work is data: collecting, cleaning and versioning it. Training is one box.', 'Simulate drift: the model didn\'t change — the world did. Monitoring catches it and triggers retraining.'], ask: 'Spiron wants photo captions. Bedrock, custom training, or self-hosting?', answer: 'Start with a managed model for speed; train or fine-tune only if quality or cost demands it; self-host only at high, steady volume with a team to run it.', transition: 'Data preparation runs on many machines at once. How does that work?' },
   check: { q: 'Production accuracy drops while the model is unchanged. Most likely?', opts: ['The GPU is too slow', 'Data drift', 'The registry is full', 'Too many replicas'], a: 1, why: 'When real-world inputs shift away from the training distribution, a fixed model gets less accurate. Monitoring and retraining handle it.' }
 });
 
@@ -303,7 +303,7 @@ scene({
   html: `
   <div class="split" style="grid-template-columns:minmax(280px,0.8fr) minmax(0,2.2fr)">
     <div class="rail">
-      <p class="lede">Count every hashtag in 200 GB of Pixelpost posts. Split the data, process pieces in parallel, then combine.</p>
+      <p class="lede">Count every hashtag in 200 GB of Spiron posts. Split the data, process pieces in parallel, then combine.</p>
       <div class="controls stack" id="ctl"></div>
       <div class="tiles" id="tiles"></div>
       <div class="explain" id="why" aria-live="polite"></div>

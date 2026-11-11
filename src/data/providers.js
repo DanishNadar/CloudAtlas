@@ -77,17 +77,17 @@ const HIER = {
     ['org', null, 'Organization', 'root', 'Management account owns the organization and receives the consolidated bill.'],
     ['ouP', 'org', 'OU: Production', 'group', 'Organizational units group accounts so policies can be applied once.'],
     ['ouD', 'org', 'OU: Development', 'group', ''],
-    ['aP', 'ouP', 'Account: pixelpost-prod', 'unit', 'An AWS account is the main isolation and billing boundary.'],
+    ['aP', 'ouP', 'Account: Spiron-prod', 'unit', 'An AWS account is the main isolation and billing boundary.'],
     ['aS', 'ouP', 'Account: security-logs', 'unit', ''],
-    ['aD', 'ouD', 'Account: pixelpost-dev', 'unit', ''],
+    ['aD', 'ouD', 'Account: Spiron-dev', 'unit', ''],
     ['r1', 'aP', 'EC2 instance', 'res', ''], ['r2', 'aP', 'S3 bucket', 'res', ''], ['r3', 'aD', 'EC2 instance', 'res', '']
   ] },
   azure: { policy: 'Azure Policy assignment', bill: 'sub', nodes: [
     ['org', null, 'Entra tenant · root group', 'root', 'The tenant holds identities; the root management group sits above every subscription.'],
     ['ouP', 'org', 'Mgmt group: Production', 'group', 'Management groups apply policy and access to many subscriptions.'],
     ['ouD', 'org', 'Mgmt group: Development', 'group', ''],
-    ['aP', 'ouP', 'Subscription: pixelpost-prod', 'unit', 'A subscription is the billing and quota boundary.'],
-    ['aD', 'ouD', 'Subscription: pixelpost-dev', 'unit', ''],
+    ['aP', 'ouP', 'Subscription: Spiron-prod', 'unit', 'A subscription is the billing and quota boundary.'],
+    ['aD', 'ouD', 'Subscription: Spiron-dev', 'unit', ''],
     ['aS', 'aP', 'Resource group: rg-web', 'unit2', 'Resource groups hold resources that share a lifecycle.'],
     ['r1', 'aS', 'Virtual machine', 'res', ''], ['r2', 'aS', 'Storage account', 'res', ''], ['r3', 'aD', 'Resource group: rg-test', 'unit2', '']
   ] },
@@ -95,9 +95,9 @@ const HIER = {
     ['org', null, 'Organization (example.com)', 'root', 'Tied to your company domain; policies and IAM set here apply everywhere below.'],
     ['ouP', 'org', 'Folder: Production', 'group', 'Folders group projects by team or environment.'],
     ['ouD', 'org', 'Folder: Development', 'group', ''],
-    ['aP', 'ouP', 'Project: pixelpost-prod', 'unit', 'A project holds resources and is linked to a Cloud Billing account.'],
+    ['aP', 'ouP', 'Project: Spiron-prod', 'unit', 'A project holds resources and is linked to a Cloud Billing account.'],
     ['aS', 'ouP', 'Project: shared-network', 'unit', ''],
-    ['aD', 'ouD', 'Project: pixelpost-dev', 'unit', ''],
+    ['aD', 'ouD', 'Project: Spiron-dev', 'unit', ''],
     ['r1', 'aP', 'Compute Engine VM', 'res', ''], ['r2', 'aP', 'Cloud Storage bucket', 'res', ''], ['r3', 'aD', 'Compute Engine VM', 'res', '']
   ] }
 };

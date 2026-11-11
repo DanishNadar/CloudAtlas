@@ -25,7 +25,7 @@ scene({
   mount(el, slide) {
     let style = 'serverless', stage = 0, selId = null;
     const STAGES = [
-      { t: 'A static portfolio', need: 'Pixelpost starts as a landing page: HTML, CSS and images, visitors worldwide.', add: { s3: 'Files need durable storage.', cloudfront: 'Visitors are global; serve from nearby and keep the bucket private.', route53: 'People type pixelpost.app, so the name must resolve.' } },
+      { t: 'A static portfolio', need: 'Spiron starts as a landing page: HTML, CSS and images, visitors worldwide.', add: { s3: 'Files need durable storage.', cloudfront: 'Visitors are global; serve from nearby and keep the bucket private.', route53: 'People type Spiron.app, so the name must resolve.' } },
       { t: 'Users can post photos', need: 'Now the app does things: upload, comment, like. That needs code that runs on demand.', add: s => s === 'serverless' ? { apigw: 'A front door for HTTP API calls with throttling.', lambda: 'Run code per request without servers to manage.' } : s === 'containers' ? { elb: 'Spread requests across container tasks and health-check them.', ecs: 'Run the app as containers; Fargate removes host management.' } : { elb: 'Spread requests across servers and skip unhealthy ones.', ec2: 'Virtual machines run the app with full OS control.' } },
       { t: 'Remember posts and users', need: 'Posts, comments and accounts must survive restarts and be queryable.', add: s => s === 'serverless' ? { dynamodb: 'Key-based access (user → posts) at any scale without servers.' } : { rds: 'Relational data: users, posts, follows, with joins and transactions.' } },
       { t: 'Sign-in and least privilege', need: 'Users need accounts, and each piece of code should only access what it needs.', add: { cognito: 'End-user sign-up, sign-in and tokens.', iam: 'Roles give the code temporary, scoped permissions — no hard-coded keys.' } },
@@ -50,7 +50,7 @@ scene({
       if (comp) ['dynamodb', 'rds', 'elasticache', 's3', 'secrets'].filter(has).forEach(t => e.push([comp, t, t === 's3' || t === 'secrets' ? 'dash' : '']));
       if (has('cognito') && entry) e.push(['cognito', entry, 'dash']); if (has('waf')) e.push(['waf', 'cloudfront', 'dash']); if (has('iam') && comp) e.push(['iam', comp, 'dash']);
       const bounds = ('vpc' in ids) ? [{ x: 345, y: 165, w: 600, h: 290, label: 'VPC · private subnets for compute and data', kind: 'priv' }] : [];
-      F = U.flow(host, { size: [960, 700], nodes, edges: e, boundaries: bounds, onClick: pick, label: 'Pixelpost architecture' });
+      F = U.flow(host, { size: [960, 700], nodes, edges: e, boundaries: bounds, onClick: pick, label: 'Spiron architecture' });
       Object.keys(ids).filter(id => id !== 'vpc').forEach(id => F.state(id, ids[id] === stage ? 'on' : 'done'));
       if (selId && F.N[selId]) F.N[selId].g.classList.add('sel');
       const S = STAGES[stage]; const now = typeof S.add === 'function' ? S.add(style) : S.add;
@@ -77,7 +77,7 @@ scene({
     answer: 'API Gateway is the front door and Lambda scales per request; there is no fleet of long-lived servers to balance across.',
     transition: 'We drew boxes inside a "private network". What does private actually mean?'
   },
-  check: { q: 'Pixelpost needs to store millions of user photos. Which building block fits best?', opts: ['A relational database', 'Object storage (S3)', 'An EBS volume on one server', 'An in-memory cache'], a: 1, why: 'Object storage is built for large numbers of files accessed by key, at low cost and high durability. The database stores the photo\'s key and metadata.' }
+  check: { q: 'Spiron needs to store millions of user photos. Which building block fits best?', opts: ['A relational database', 'Object storage (S3)', 'An EBS volume on one server', 'An in-memory cache'], a: 1, why: 'Object storage is built for large numbers of files accessed by key, at low cost and high durability. The database stores the photo\'s key and metadata.' }
 });
 
 scene({

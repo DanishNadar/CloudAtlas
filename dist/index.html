@@ -2223,7 +2223,7 @@ const CASES = [
   { id: 'shop', lvl: 2, title: 'E-commerce website', req: ['Catalog browsing at high read volume', 'Checkout with payments and inventory integrity', 'Seasonal peaks'],
     comps: [['CloudFront', 'Product images and pages at the edge.'], ['ALB + Auto Scaling app tier', 'Elastic capacity for peaks.'], ['ElastiCache', 'Hot catalog reads.'], ['RDS (orders, inventory)', 'Transactions for money and stock.'], ['SQS queue', 'Decouples order fulfillment and emails from checkout.'], ['External payment provider', 'Card processing (with timeouts and retries).']],
     scale: 'Cache and CDN for reads; queue to smooth write bursts; pre-scale before sales.', fail: 'Payment provider slowness; inventory oversell under concurrency.', sec: 'PCI scope minimized by using a payment provider; WAF rate limits.', cost: 'Peak capacity, cache nodes, data transfer for images.', alt: 'DynamoDB for carts/sessions; a hosted commerce platform.' },
-  { id: 'photos', lvl: 2, title: 'Photo-sharing application (Pixelpost)', req: ['Upload and view photos', 'Thumbnails in several sizes', 'Feeds per user'],
+  { id: 'photos', lvl: 2, title: 'Photo-sharing application (Spiron)', req: ['Upload and view photos', 'Thumbnails in several sizes', 'Feeds per user'],
     comps: [['Pre-signed S3 uploads', 'Clients upload directly; servers stay small.'], ['S3 event → Lambda', 'Generates thumbnails on each upload.'], ['DynamoDB', 'Posts and feeds by user key.'], ['CloudFront', 'Delivers photos globally.'], ['Cognito', 'User sign-in.']],
     scale: 'Each upload triggers its own function; storage is effectively unbounded.', fail: 'Thumbnail failures (use a dead-letter queue); hot partitions for celebrity users.', sec: 'Short-lived upload URLs scoped to one key; private bucket.', cost: 'Storage growth (use lifecycle tiers) and egress.', alt: 'Containers for image processing at steady high volume.' },
   { id: 'video', lvl: 3, title: 'Video-streaming application', req: ['Upload once, play on any device', 'Adaptive quality', 'Global audience'],
@@ -2375,17 +2375,17 @@ const HIER = {
     ['org', null, 'Organization', 'root', 'Management account owns the organization and receives the consolidated bill.'],
     ['ouP', 'org', 'OU: Production', 'group', 'Organizational units group accounts so policies can be applied once.'],
     ['ouD', 'org', 'OU: Development', 'group', ''],
-    ['aP', 'ouP', 'Account: pixelpost-prod', 'unit', 'An AWS account is the main isolation and billing boundary.'],
+    ['aP', 'ouP', 'Account: Spiron-prod', 'unit', 'An AWS account is the main isolation and billing boundary.'],
     ['aS', 'ouP', 'Account: security-logs', 'unit', ''],
-    ['aD', 'ouD', 'Account: pixelpost-dev', 'unit', ''],
+    ['aD', 'ouD', 'Account: Spiron-dev', 'unit', ''],
     ['r1', 'aP', 'EC2 instance', 'res', ''], ['r2', 'aP', 'S3 bucket', 'res', ''], ['r3', 'aD', 'EC2 instance', 'res', '']
   ] },
   azure: { policy: 'Azure Policy assignment', bill: 'sub', nodes: [
     ['org', null, 'Entra tenant · root group', 'root', 'The tenant holds identities; the root management group sits above every subscription.'],
     ['ouP', 'org', 'Mgmt group: Production', 'group', 'Management groups apply policy and access to many subscriptions.'],
     ['ouD', 'org', 'Mgmt group: Development', 'group', ''],
-    ['aP', 'ouP', 'Subscription: pixelpost-prod', 'unit', 'A subscription is the billing and quota boundary.'],
-    ['aD', 'ouD', 'Subscription: pixelpost-dev', 'unit', ''],
+    ['aP', 'ouP', 'Subscription: Spiron-prod', 'unit', 'A subscription is the billing and quota boundary.'],
+    ['aD', 'ouD', 'Subscription: Spiron-dev', 'unit', ''],
     ['aS', 'aP', 'Resource group: rg-web', 'unit2', 'Resource groups hold resources that share a lifecycle.'],
     ['r1', 'aS', 'Virtual machine', 'res', ''], ['r2', 'aS', 'Storage account', 'res', ''], ['r3', 'aD', 'Resource group: rg-test', 'unit2', '']
   ] },
@@ -2393,9 +2393,9 @@ const HIER = {
     ['org', null, 'Organization (example.com)', 'root', 'Tied to your company domain; policies and IAM set here apply everywhere below.'],
     ['ouP', 'org', 'Folder: Production', 'group', 'Folders group projects by team or environment.'],
     ['ouD', 'org', 'Folder: Development', 'group', ''],
-    ['aP', 'ouP', 'Project: pixelpost-prod', 'unit', 'A project holds resources and is linked to a Cloud Billing account.'],
+    ['aP', 'ouP', 'Project: Spiron-prod', 'unit', 'A project holds resources and is linked to a Cloud Billing account.'],
     ['aS', 'ouP', 'Project: shared-network', 'unit', ''],
-    ['aD', 'ouD', 'Project: pixelpost-dev', 'unit', ''],
+    ['aD', 'ouD', 'Project: Spiron-dev', 'unit', ''],
     ['r1', 'aP', 'Compute Engine VM', 'res', ''], ['r2', 'aP', 'Cloud Storage bucket', 'res', ''], ['r3', 'aD', 'Compute Engine VM', 'res', '']
   ] }
 };
@@ -2404,12 +2404,12 @@ const HIER = {
 /* Opening journey · Chapter 1 (why the cloud) · Chapter 2 (responsibility) · Chapter 3 (global infrastructure) */
 
 const JOURNEY_INFO = {
-  browser: ['Your browser', 'The client. It knows a name (pixelpost.app), turns it into an address, opens an encrypted connection, sends HTTP requests and renders what comes back.'],
+  browser: ['Your browser', 'The client. It knows a name (Spiron.app), turns it into an address, opens an encrypted connection, sends HTTP requests and renders what comes back.'],
   resolver: ['DNS resolver', 'Usually run by your ISP or a public DNS service. It looks up names on your behalf and caches answers for their time-to-live (TTL).'],
-  auth: ['Authoritative DNS', 'The source of truth for pixelpost.app records. Here it is Amazon Route 53, which can answer differently by location or health.'],
+  auth: ['Authoritative DNS', 'The source of truth for Spiron.app records. Here it is Amazon Route 53, which can answer differently by location or health.'],
   edge: ['CDN edge location', 'A cache close to users (Amazon CloudFront). It serves copies of files it already has and forwards everything else to the origin.'],
   lb: ['Load balancer', 'Elastic Load Balancing receives requests for the application and spreads them across healthy servers, using health checks to skip broken ones.'],
-  app1: ['Application server', 'Runs Pixelpost\'s code: checks the session, builds the feed and talks to data stores. Could equally be a container or a Lambda function.'],
+  app1: ['Application server', 'Runs Spiron\'s code: checks the session, builds the feed and talks to data stores. Could equally be a container or a Lambda function.'],
   app2: ['Application server', 'A second copy of the same code. Copies let the app handle more traffic and survive one server failing.'],
   db: ['Database', 'Stores structured records: users, posts, likes. Amazon RDS or DynamoDB are typical choices; Chapter 7 compares them.'],
   s3: ['Object storage', 'Amazon S3 stores the photos and static files (images, scripts, styles) as objects addressed by key.'],
@@ -2426,7 +2426,7 @@ scene({
     <div class="rail" style="justify-content:center">
       <div class="kicker">Prologue · follow one request end to end</div>
       <h1 class="hero-title">What actually happens when you <em>open a website?</em></h1>
-      <p class="hero-sub">Follow one request for <b>pixelpost.app</b>, a photo-sharing app we will grow all the way into an AI product.</p>
+      <p class="hero-sub">Follow one request for <b>Spiron.app</b>, a photo-sharing app we will grow all the way into an AI product.</p>
       <div class="urlbar" aria-label="Address bar"><span class="lock">●</span><span id="url"></span><span class="caret"></span></div>
       <div class="controls" id="opts"></div>
       <div id="stepper"></div>
@@ -2475,7 +2475,7 @@ scene({
     const steps = () => {
       const path = O.type === 'api' ? '/api/feed' : '/photos/sunset.jpg';
       const s = [
-        { t: 'You type a name', n: ['browser'], h: [], url: 'pixelpost.app' + path,
+        { t: 'You type a name', n: ['browser'], h: [], url: 'Spiron.app' + path,
           e: 'Your browser knows a name, not a location. Computers route traffic to numeric IP addresses, so the name must be translated first.',
           g: 'The browser checks its own DNS cache and the operating system\'s resolver cache before asking the network.' },
         { t: 'DNS: name → address', n: ['resolver', 'auth'], h: [['browser', 'resolver'], ['resolver', 'auth']],
@@ -2485,7 +2485,7 @@ scene({
           e: 'DNS returns the address of a CDN edge location near you, not of a single faraway server.',
           g: 'CloudFront distributions are reached through DNS records (an alias in Route 53) that resolve to edge addresses chosen to be close to the resolver.' },
         { t: 'Open a secure connection', n: ['browser', 'edge'], h: [['browser', 'edge'], ['edge', 'browser', 'ret']],
-          e: 'Before sending anything private, the browser and the edge agree on encryption and the edge proves it really is pixelpost.app.',
+          e: 'Before sending anything private, the browser and the edge agree on encryption and the edge proves it really is Spiron.app.',
           g: 'TCP handshake (1 round trip) + TLS 1.3 handshake (1 round trip). HTTP/3 runs over QUIC, which combines them. The TLS certificate must match the domain.' },
         { t: 'Send the request', n: ['edge'], h: [['browser', 'edge']],
           e: `The browser sends <code class="k">GET ${path}</code>. The edge decides whether it can answer by itself.`,
@@ -2495,7 +2495,7 @@ scene({
         s.push({ t: 'Cache hit', n: ['edge'], h: [['edge', 'browser', 'ret']], e: 'The edge already holds a fresh copy of this image, so it answers immediately. The origin servers never see the request.',
           g: 'The response carries an <code class="k">Age</code> header and a cache-status header. Freshness comes from Cache-Control / TTL settings.' });
       } else if (O.type === 'page') {
-        s.push({ t: 'Cache miss → origin', n: ['edge', 's3'], h: [['edge', 's3'], ['s3', 'edge', 'ret']], e: 'The edge doesn\'t have this file yet, so it fetches it from the origin: the S3 bucket holding Pixelpost\'s photos.',
+        s.push({ t: 'Cache miss → origin', n: ['edge', 's3'], h: [['edge', 's3'], ['s3', 'edge', 'ret']], e: 'The edge doesn\'t have this file yet, so it fetches it from the origin: the S3 bucket holding Spiron\'s photos.',
           g: 'With origin access control, only CloudFront may read the bucket; the bucket itself stays private.' });
         s.push({ t: 'Cache and deliver', n: ['edge'], h: [['edge', 'browser', 'ret']], e: 'The edge stores a copy for the next visitor nearby and returns the image to you.', g: 'Subsequent requests in that region become cache hits until the object expires or is invalidated.' });
       } else {
@@ -2557,7 +2557,7 @@ scene({
   html: `
   <div class="split" style="grid-template-columns:minmax(280px,0.85fr) minmax(0,2.1fr)">
     <div class="rail">
-      <p class="lede">Pixelpost is growing. Do you <b>buy servers</b> and wait for delivery, or <b>rent capacity</b> by the hour?</p>
+      <p class="lede">Spiron is growing. Do you <b>buy servers</b> and wait for delivery, or <b>rent capacity</b> by the hour?</p>
       <div class="controls stack" id="ctl"></div>
       <div class="tiles" id="tiles"></div>
       <div class="explain" id="story" aria-live="polite"></div>
@@ -2814,7 +2814,7 @@ scene({
   mount(el, slide) {
     let style = 'serverless', stage = 0, selId = null;
     const STAGES = [
-      { t: 'A static portfolio', need: 'Pixelpost starts as a landing page: HTML, CSS and images, visitors worldwide.', add: { s3: 'Files need durable storage.', cloudfront: 'Visitors are global; serve from nearby and keep the bucket private.', route53: 'People type pixelpost.app, so the name must resolve.' } },
+      { t: 'A static portfolio', need: 'Spiron starts as a landing page: HTML, CSS and images, visitors worldwide.', add: { s3: 'Files need durable storage.', cloudfront: 'Visitors are global; serve from nearby and keep the bucket private.', route53: 'People type Spiron.app, so the name must resolve.' } },
       { t: 'Users can post photos', need: 'Now the app does things: upload, comment, like. That needs code that runs on demand.', add: s => s === 'serverless' ? { apigw: 'A front door for HTTP API calls with throttling.', lambda: 'Run code per request without servers to manage.' } : s === 'containers' ? { elb: 'Spread requests across container tasks and health-check them.', ecs: 'Run the app as containers; Fargate removes host management.' } : { elb: 'Spread requests across servers and skip unhealthy ones.', ec2: 'Virtual machines run the app with full OS control.' } },
       { t: 'Remember posts and users', need: 'Posts, comments and accounts must survive restarts and be queryable.', add: s => s === 'serverless' ? { dynamodb: 'Key-based access (user → posts) at any scale without servers.' } : { rds: 'Relational data: users, posts, follows, with joins and transactions.' } },
       { t: 'Sign-in and least privilege', need: 'Users need accounts, and each piece of code should only access what it needs.', add: { cognito: 'End-user sign-up, sign-in and tokens.', iam: 'Roles give the code temporary, scoped permissions — no hard-coded keys.' } },
@@ -2839,7 +2839,7 @@ scene({
       if (comp) ['dynamodb', 'rds', 'elasticache', 's3', 'secrets'].filter(has).forEach(t => e.push([comp, t, t === 's3' || t === 'secrets' ? 'dash' : '']));
       if (has('cognito') && entry) e.push(['cognito', entry, 'dash']); if (has('waf')) e.push(['waf', 'cloudfront', 'dash']); if (has('iam') && comp) e.push(['iam', comp, 'dash']);
       const bounds = ('vpc' in ids) ? [{ x: 345, y: 165, w: 600, h: 290, label: 'VPC · private subnets for compute and data', kind: 'priv' }] : [];
-      F = U.flow(host, { size: [960, 700], nodes, edges: e, boundaries: bounds, onClick: pick, label: 'Pixelpost architecture' });
+      F = U.flow(host, { size: [960, 700], nodes, edges: e, boundaries: bounds, onClick: pick, label: 'Spiron architecture' });
       Object.keys(ids).filter(id => id !== 'vpc').forEach(id => F.state(id, ids[id] === stage ? 'on' : 'done'));
       if (selId && F.N[selId]) F.N[selId].g.classList.add('sel');
       const S = STAGES[stage]; const now = typeof S.add === 'function' ? S.add(style) : S.add;
@@ -2866,7 +2866,7 @@ scene({
     answer: 'API Gateway is the front door and Lambda scales per request; there is no fleet of long-lived servers to balance across.',
     transition: 'We drew boxes inside a "private network". What does private actually mean?'
   },
-  check: { q: 'Pixelpost needs to store millions of user photos. Which building block fits best?', opts: ['A relational database', 'Object storage (S3)', 'An EBS volume on one server', 'An in-memory cache'], a: 1, why: 'Object storage is built for large numbers of files accessed by key, at low cost and high durability. The database stores the photo\'s key and metadata.' }
+  check: { q: 'Spiron needs to store millions of user photos. Which building block fits best?', opts: ['A relational database', 'Object storage (S3)', 'An EBS volume on one server', 'An in-memory cache'], a: 1, why: 'Object storage is built for large numbers of files accessed by key, at low cost and high durability. The database stores the photo\'s key and metadata.' }
 });
 
 scene({
@@ -3098,7 +3098,7 @@ scene({
     const follow = () => {
       pane.innerHTML = `<div class="split rev" style="flex:1"><div class="col"><div class="controls" id="flows"></div><div class="viz grid" style="min-height:330px"><div class="cvhost" id="fd"></div></div></div>
         <div class="rail"><div id="sp"></div><div class="explain" id="fx" aria-live="polite"></div><div class="engbox eng-only" id="fg"></div></div></div>`;
-      const nodes = { client: { x: 80, y: 200, label: 'Pixelpost app', sub: 'phone', kind: 'client', w: 140 }, app: { x: 290, y: 200, label: 'App server', sub: 'API', w: 140 }, s3: { x: 520, y: 70, label: 'Object storage', sub: 'S3', w: 160 }, cache: { x: 520, y: 200, label: 'Cache', sub: 'ElastiCache', w: 160 }, db: { x: 520, y: 330, label: 'Relational DB', sub: 'RDS primary · AZ a', w: 170 }, standby: { x: 760, y: 330, label: 'Standby', sub: 'AZ b · synchronous', w: 160 }, backup: { x: 760, y: 450, label: 'Backups', sub: 'snapshots', w: 160 } };
+      const nodes = { client: { x: 80, y: 200, label: 'Spiron app', sub: 'phone', kind: 'client', w: 140 }, app: { x: 290, y: 200, label: 'App server', sub: 'API', w: 140 }, s3: { x: 520, y: 70, label: 'Object storage', sub: 'S3', w: 160 }, cache: { x: 520, y: 200, label: 'Cache', sub: 'ElastiCache', w: 160 }, db: { x: 520, y: 330, label: 'Relational DB', sub: 'RDS primary · AZ a', w: 170 }, standby: { x: 760, y: 330, label: 'Standby', sub: 'AZ b · synchronous', w: 160 }, backup: { x: 760, y: 450, label: 'Backups', sub: 'snapshots', w: 160 } };
       const edges = [['client', 'app'], ['client', 's3', 'dash'], ['app', 's3'], ['app', 'cache'], ['app', 'db'], ['db', 'standby'], ['db', 'backup', 'dash']];
       const F = U.flow(el.querySelector('#fd'), { size: [860, 500], nodes, edges, label: 'Data flow' });
       const FL = {
@@ -3189,7 +3189,7 @@ scene({
       <details class="explain" open><summary style="cursor:pointer;font-weight:600">Policy JSON</summary><pre class="code" id="json" style="margin-top:8px"></pre></details>
     </div>
     <div class="rail">
-      <div class="explain"><h4>The app role "pixelpost-api" makes these calls</h4><p>Only the first four are part of its job.</p></div>
+      <div class="explain"><h4>The app role "Spiron-api" makes these calls</h4><p>Only the first four are part of its job.</p></div>
       <div class="tscroll"><table class="t" id="req"></table></div>
       <div class="tiles" id="tiles"></div>
       <div class="explain" id="why" aria-live="polite"></div>
@@ -3251,7 +3251,7 @@ scene({
 const IAC = {
   tf: `# Terraform (HCL)
 resource "aws_s3_bucket" "photos" {
-  bucket = "pixelpost-photos"
+  bucket = "Spiron-photos"
 }
 
 resource "aws_s3_bucket_public_access_block" "photos" {
@@ -3328,7 +3328,7 @@ scene({
       await stage(0, true, 'webhook → pipeline triggered');
       if (!await stage(1, !F.test, F.test ? '✗ 3 of 214 tests failed: test_feed_pagination' : '✓ 214 unit + 18 integration tests passed', 900)) return end('no', 'Stopped at tests', 'Nothing was built or deployed. Production keeps serving v1.9 untouched. The developer gets the failing test names and fixes the code. This is the cheapest place to catch a bug.');
       if (!await stage(2, !F.build, F.build ? '✗ build failed: dependency "imagelib==4.0" not found' : '✓ build complete, 2m 10s')) return end('no', 'Stopped at build', 'No artifact exists, so there is nothing to deploy. Pin dependency versions and cache them so builds are reproducible.');
-      await stage(3, true, '✓ pushed image pixelpost:2.0 (sha256:9c1e…) to the container registry; scanned for known vulnerabilities');
+      await stage(3, true, '✓ pushed image Spiron:2.0 (sha256:9c1e…) to the container registry; scanned for known vulnerabilities');
       state[4] = 'run'; draw();
       const bad = F.config ? 'config' : F.unhealthy ? 'unhealthy' : null;
       if (strat === 'canary') {
@@ -3517,7 +3517,7 @@ scene({
   html: `
   <div class="split" style="grid-template-columns:minmax(290px,0.85fr) minmax(0,2fr)">
     <div class="rail" style="gap:10px">
-      <p class="lede">Pixelpost must handle <b id="pk">1,200</b> req/s at peak on a monthly budget.</p>
+      <p class="lede">Spiron must handle <b id="pk">1,200</b> req/s at peak on a monthly budget.</p>
       <div class="controls stack" id="ctl"></div>
     </div>
     <div class="col">
@@ -3581,7 +3581,7 @@ scene({
       <div class="controls" id="opts"></div>
       <div class="viz grid" style="min-height:300px"><div class="cvhost" id="fl"></div></div>
       <div class="grid2" style="align-items:stretch">
-        <div class="explain"><h4>Pixelpost Assistant</h4><p class="mono" style="font-size:13px;color:var(--fg)">You: How do I reset my password?</p><p id="ans" style="margin-top:6px;color:var(--fg);min-height:3.2em"></p></div>
+        <div class="explain"><h4>Spiron Assistant</h4><p class="mono" style="font-size:13px;color:var(--fg)">You: How do I reset my password?</p><p id="ans" style="margin-top:6px;color:var(--fg);min-height:3.2em"></p></div>
         <div class="explain"><h4>Context window</h4><div id="ctx"></div></div>
       </div>
     </div>
@@ -3600,7 +3600,7 @@ scene({
       cache: { x: 460, y: 70, label: 'Response cache', sub: 'exact / semantic', w: 160 }, emb: { x: 660, y: 70, label: 'Embedding model', sub: 'text → vector', w: 160, kind: 'ai' }, vec: { x: 860, y: 70, label: 'Vector index', sub: 'top-k search', w: 150 },
       llm: { x: 760, y: 210, label: 'LLM inference', sub: 'GPU servers', w: 170, kind: 'ai', h: 60 }, docs: { x: 860, y: 340, label: 'Documents', sub: 'S3', w: 140 }, mon: { x: 460, y: 340, label: 'Monitoring', sub: 'tokens · latency · cost', w: 170 } };
     const F = U.flow(el.querySelector('#fl'), { size: [960, 400], nodes, edges: [['user', 'gw'], ['gw', 'app'], ['app', 'cache'], ['app', 'emb'], ['emb', 'vec'], ['vec', 'app', 'dash'], ['app', 'llm'], ['app', 'mon'], ['docs', 'vec', 'dash'], ['llm', 'mon', 'dash']], boundaries: [{ x: 570, y: 140, w: 380, h: 140, label: 'MODEL SERVING', kind: 'ai' }], label: 'LLM application architecture' });
-    const ANS = { rag: 'Open Settings → Security → Reset password. We email you a link that stays valid for 30 minutes. If it expires, request a new one. [source: help/account-security.md]', plain: 'I don\'t have Pixelpost-specific instructions, but most apps let you reset a password from the sign-in screen with a "Forgot password?" link.' };
+    const ANS = { rag: 'Open Settings → Security → Reset password. We email you a link that stays valid for 30 minutes. If it expires, request a new one. [source: help/account-security.md]', plain: 'I don\'t have Spiron-specific instructions, but most apps let you reset a password from the sign-in screen with a "Forgot password?" link.' };
     const tok = { sys: 320, q: 12, passage: 380 };
     const ctxBox = el.querySelector('#ctx'); const WIN = 8192;
     const ctx = (show) => { const parts = [['system prompt', tok.sys, 'var(--blue)'], ['question', tok.q, 'var(--cyan)']].concat(O.rag && show ? [['4 retrieved passages', tok.passage * 4, 'var(--violet)']] : []); const used = parts.reduce((s, p) => s + p[1], 0); const out = 60;
@@ -3865,7 +3865,7 @@ scene({
     U.btn(c, 'Run the pipeline', () => flowRun(false), 'primary'); U.btn(c, 'Simulate data drift', () => flowRun(true), 'warn');
     pick('train');
   },
-  notes: { objective: 'Learners describe the ML lifecycle as a loop with distinct resources and failure modes per stage.', say: ['Most of the work is data: collecting, cleaning and versioning it. Training is one box.', 'Simulate drift: the model didn\'t change — the world did. Monitoring catches it and triggers retraining.'], ask: 'Pixelpost wants photo captions. Bedrock, custom training, or self-hosting?', answer: 'Start with a managed model for speed; train or fine-tune only if quality or cost demands it; self-host only at high, steady volume with a team to run it.', transition: 'Data preparation runs on many machines at once. How does that work?' },
+  notes: { objective: 'Learners describe the ML lifecycle as a loop with distinct resources and failure modes per stage.', say: ['Most of the work is data: collecting, cleaning and versioning it. Training is one box.', 'Simulate drift: the model didn\'t change — the world did. Monitoring catches it and triggers retraining.'], ask: 'Spiron wants photo captions. Bedrock, custom training, or self-hosting?', answer: 'Start with a managed model for speed; train or fine-tune only if quality or cost demands it; self-host only at high, steady volume with a team to run it.', transition: 'Data preparation runs on many machines at once. How does that work?' },
   check: { q: 'Production accuracy drops while the model is unchanged. Most likely?', opts: ['The GPU is too slow', 'Data drift', 'The registry is full', 'Too many replicas'], a: 1, why: 'When real-world inputs shift away from the training distribution, a fixed model gets less accurate. Monitoring and retraining handle it.' }
 });
 
@@ -3875,7 +3875,7 @@ scene({
   html: `
   <div class="split" style="grid-template-columns:minmax(280px,0.8fr) minmax(0,2.2fr)">
     <div class="rail">
-      <p class="lede">Count every hashtag in 200 GB of Pixelpost posts. Split the data, process pieces in parallel, then combine.</p>
+      <p class="lede">Count every hashtag in 200 GB of Spiron posts. Split the data, process pieces in parallel, then combine.</p>
       <div class="controls stack" id="ctl"></div>
       <div class="tiles" id="tiles"></div>
       <div class="explain" id="why" aria-live="polite"></div>
@@ -4131,7 +4131,6 @@ scene({
       <h1 class="hero-title">Learn the cloud by <em>watching it work.</em></h1>
       <p class="hero-sub"><span id="nsc"></span> animated scenes and simulators take you from "what is a server?" to designing systems on <span class="pv aws">AWS</span>, <span class="pv azure">Microsoft Azure</span> and <span class="pv gcp">Google Cloud</span> — and running AI on them.</p>
       <div class="controls" id="cta"></div>
-      <p class="c-dim" style="font-size:13.5px;margin:0">No account, credentials or install needed — every lab runs in your browser. Use the theme switch (top right) to view the course in AWS, Azure or Google Cloud colors.</p>
     </div>
     <div class="viz hero-viz"><div class="cvhost" id="sky"></div></div>
   </div>
@@ -4222,12 +4221,12 @@ scene({
       <div class="split even" style="flex:0 0 auto;gap:12px"><div class="tiles" id="tiles"></div><div class="viz" style="min-height:120px;flex:0 0 120px"><div class="cvhost" id="spark"></div></div></div>
     </div>
   </div>`,
-  notice: 'The orange squares are Pixelpost\'s servers. They appear when its users arrive and are handed back to the shared pool when they leave — and the meter only runs while they exist.',
+  notice: 'The orange squares are Spiron\'s servers. They appear when its users arrive and are handed back to the shared pool when they leave — and the meter only runs while they exist.',
   myth: '"The cloud" is not somewhere abstract. It is physical buildings full of servers, owned by a provider and shared by many customers.',
   mount(el, slide) {
     const k = U.tok(slide);
     const COLS = 10, ROWS = 5, N = COLS * ROWS;
-    const T = [{ id: 'px', name: 'Pixelpost', c: '#FF9900' }, { id: 'shop', name: 'Shop', c: '#3AA0FF' }, { id: 'school', name: 'School', c: '#34A853' }];
+    const T = [{ id: 'px', name: 'Spiron', c: '#FF9900' }, { id: 'shop', name: 'Shop', c: '#3AA0FF' }, { id: 'school', name: 'School', c: '#34A853' }];
     const host = el.querySelector('#pool');
     let cells = ''; for (let i = 0; i < N; i++) { const x = 500 + (i % COLS) * 37, y = 112 + Math.floor(i / COLS) * 46; cells += `<g class="slot" data-i="${i}"><rect x="${x}" y="${y}" width="31" height="38" rx="4"/><rect class="sled" x="${x + 6}" y="${y + 30}" width="19" height="3" rx="1.5"/></g>`; }
     host.innerHTML = `<svg viewBox="0 0 900 430" class="flow" role="img" aria-label="Users connect over the internet to a shared pool of servers in a provider data center">
@@ -4246,7 +4245,7 @@ scene({
       return { px: Math.max(1, (S.users / 10) * (0.35 + 0.65 * day) * (S.spike > 0 ? 2.2 : 1)) + S.manual, shop: 6 + 7 * Math.max(0, Math.sin(Math.PI * (h - 10) / 14)), school: 1 + 9 * (h >= 8 && h < 16 ? 1 : 0) };
     };
     const ctl = el.querySelector('#ctl');
-    U.slider(ctl, { label: 'Pixelpost users (thousands)', min: 10, max: 160, step: 10, value: S.users, fmt: v => v + 'k' }, v => { S.users = v; });
+    U.slider(ctl, { label: 'Spiron users (thousands)', min: 10, max: 160, step: 10, value: S.users, fmt: v => v + 'k' }, v => { S.users = v; });
     const cb = el.querySelector('#ctl'); const row = document.createElement('div'); row.className = 'controls'; cb.appendChild(row);
     U.btn(row, `${U.icon('rocket')} Launch campaign (traffic ×2 for 4 h)`, () => { S.spike = 4; flash('elastic'); }, 'primary');
     U.btn(row, `${U.icon('gear')} Launch 1 server yourself`, () => { S.manual++; flash('self'); });
@@ -4273,7 +4272,7 @@ scene({
     };
     let acc = 0, pacc = 0, need = allocate();
     const tiles = el.querySelector('#tiles');
-    const sp = U.canvas(el.querySelector('#spark'), () => { const hs = S.hist; U.chart(sp, { k, x: [0, 48], y: [0, Math.max(10, ...hs.map(h => Math.max(h.d, h.a))) * 1.15], padL: 34, padB: 22, padT: 22, xTicks: 4, yTicks: 2, xFmt: v => '-' + Math.round(48 - v) + 'h', yLabel: 'Pixelpost: needed vs. running servers', series: [{ data: hs.map(h => h.d), color: k.fg, width: 1.5 }, { data: hs.map(h => h.a), color: '#FF9900', step: true, fill: U.a('#FF9900', .12) }] }); });
+    const sp = U.canvas(el.querySelector('#spark'), () => { const hs = S.hist; U.chart(sp, { k, x: [0, 48], y: [0, Math.max(10, ...hs.map(h => Math.max(h.d, h.a))) * 1.15], padL: 34, padB: 22, padT: 22, xTicks: 4, yTicks: 2, xFmt: v => '-' + Math.round(48 - v) + 'h', yLabel: 'Spiron: needed vs. running servers', series: [{ data: hs.map(h => h.d), color: k.fg, width: 1.5 }, { data: hs.map(h => h.a), color: '#FF9900', step: true, fill: U.a('#FF9900', .12) }] }); });
     const stop = U.loop(dt => {
       S.t += dt; acc += dt; pacc += dt * (S.users / 40) * (S.spike > 0 ? 2 : 1);
       if (S.spike > 0) S.spike -= dt;
@@ -4292,7 +4291,7 @@ scene({
   },
   notes: {
     objective: 'Learners can define cloud computing and point to all five NIST characteristics in a live system.',
-    say: ['One sentence: someone else\'s computers, rented over the internet, on demand, paid by use.', 'Three customers share one pool. Watch the school\'s green servers appear at 8:00 and vanish at 16:00, while the shop peaks in the evening.', 'Launch a campaign: Pixelpost\'s orange squares multiply, then hand back to the pool. The meter only counts while they exist.'],
+    say: ['One sentence: someone else\'s computers, rented over the internet, on demand, paid by use.', 'Three customers share one pool. Watch the school\'s green servers appear at 8:00 and vanish at 16:00, while the shop peaks in the evening.', 'Launch a campaign: Spiron\'s orange squares multiply, then hand back to the pool. The meter only counts while they exist.'],
     demo: ['Click each of the five characteristics; each one highlights the part of the picture it describes.', 'Drag users to 160k to see the pool fill up.'],
     ask: 'Why can a provider offer capacity cheaper than if each customer bought for their own peak?',
     answer: 'Customers peak at different times, so the shared pool needs far less hardware than the sum of everyone\'s peaks (statistical multiplexing).',
@@ -4303,7 +4302,7 @@ scene({
 
 /* ======================= HOW THE INTERNET MOVES DATA ======================= */
 const NET_N = { you: [55, 250, 'Your laptop', '192.0.2.10'], r1: [175, 250, 'Home router', '192.0.2.1'], r2: [300, 140, 'ISP router A', '198.51.100.1'], r3: [300, 360, 'ISP router B', '198.51.100.9'],
-  r4: [450, 90, 'Backbone 1', ''], r5: [450, 250, 'Backbone 2', ''], r6: [450, 410, 'Backbone 3', ''], r7: [610, 160, 'Exchange point', ''], r8: [610, 340, 'Cloud edge', ''], r9: [740, 250, 'Region router', ''], srv: [855, 250, 'pixelpost.app', '203.0.113.5'] };
+  r4: [450, 90, 'Backbone 1', ''], r5: [450, 250, 'Backbone 2', ''], r6: [450, 410, 'Backbone 3', ''], r7: [610, 160, 'Exchange point', ''], r8: [610, 340, 'Cloud edge', ''], r9: [740, 250, 'Region router', ''], srv: [855, 250, 'Spiron.app', '203.0.113.5'] };
 const NET_L = [['you', 'r1', 2], ['r1', 'r2', 6], ['r1', 'r3', 7], ['r2', 'r4', 9], ['r2', 'r5', 8], ['r3', 'r5', 8], ['r3', 'r6', 10], ['r4', 'r7', 12], ['r5', 'r7', 9], ['r5', 'r8', 11], ['r6', 'r8', 8], ['r7', 'r9', 7], ['r8', 'r9', 5], ['r9', 'srv', 1]];
 scene({
   id: 'internet', after: 'what-is-cloud', section: 'basics', kicker: 'Basics · 2', title: 'How does data travel across the internet?', short: 'Packets & routing', ic: ['router', 'network'],
@@ -4358,7 +4357,7 @@ scene({
       st = { n: O.n, got: new Set(), order: [], re: 0, ooo: 0, maxSeen: -1 }; flying.forEach(f => f.c.remove()); flying = [];
       reasm.innerHTML = Array.from({ length: O.n }, (_, i) => `<span class="pslot" data-i="${i}">${i + 1}</span>`).join('');
       for (let i = 0; i < O.n; i++) launch(i, i * 0.18);
-      why.innerHTML = `<h4>Sending "Hello from Pixelpost!" as ${O.n} packets</h4><p>Each packet carries the destination 203.0.113.5 and a sequence number. Routers forward each packet independently along the best path they know right now.</p>`;
+      why.innerHTML = `<h4>Sending "Hello from Spiron!" as ${O.n} packets</h4><p>Each packet carries the destination 203.0.113.5 and a sequence number. Routers forward each packet independently along the best path they know right now.</p>`;
       stats();
     }
     function launch(i, delay, isRe) {
@@ -4631,7 +4630,7 @@ scene({
     demo: ['Press Play; pause on 2006, 2014 and 2022.'],
     ask: 'Which earlier idea from the timeline does serverless computing most resemble?',
     answer: 'Time-sharing and the utility model: you pay only for the time your code actually runs.',
-    transition: 'Back to Pixelpost: if you rent, who is responsible for what?'
+    transition: 'Back to Spiron: if you rent, who is responsible for what?'
   },
   check: { q: 'Which pair of launches in 2006 is usually seen as the start of the modern public cloud?', opts: ['Gmail and YouTube', 'Amazon S3 and Amazon EC2', 'Docker and Kubernetes', 'Azure and App Engine'], a: 1, why: 'AWS opened self-service, pay-as-you-go storage (S3) and virtual servers (EC2) to anyone in 2006.' }
 });
@@ -4903,7 +4902,7 @@ scene({
     demo: ['Play all six steps on AWS, then switch to Azure and Google Cloud on the last step.'],
     ask: 'Which step would you skip for a personal portfolio site, and which should you never skip?',
     answer: 'Skip sign-in and database if it is static. Never skip HTTPS (via the CDN) and a budget alert.',
-    transition: 'Now let\'s look at the building blocks of a bigger, server-based version of Pixelpost.'
+    transition: 'Now let\'s look at the building blocks of a bigger, server-based version of Spiron.'
   },
   check: { q: 'Why does step 2 put a CDN in front of the storage bucket?', opts: ['Buckets cannot store HTML', 'To cache files near users and serve them over HTTPS with your domain', 'To run the API code', 'Because DNS requires it'], a: 1, why: 'The CDN reduces latency and origin load, terminates HTTPS with a managed certificate and lets the bucket stay private.' }
 });
@@ -5017,7 +5016,7 @@ scene({
       <div class="viz" style="min-height:140px;flex:0.45"><div class="cvhost" id="ch"></div></div>
     </div>
     <div class="rail">
-      <p class="lede">Pixelpost's origin is in one Region (N. Virginia). A CDN (<span class="pv aws">CloudFront</span>, <span class="pv azure">Front Door</span>, <span class="pv gcp">Cloud CDN</span>) keeps copies at edge locations near users.</p>
+      <p class="lede">Spiron's origin is in one Region (N. Virginia). A CDN (<span class="pv aws">CloudFront</span>, <span class="pv azure">Front Door</span>, <span class="pv gcp">Cloud CDN</span>) keeps copies at edge locations near users.</p>
       <div class="controls" id="on"></div>
       <div class="controls stack" id="ctl"></div>
       <div class="controls" id="btns"></div>
@@ -5073,7 +5072,7 @@ scene({
     objective: 'Learners understand caching at the edge, TTL trade-offs and the double benefit: speed and origin offload.',
     say: ['Every dot is a request. Green: answered by a nearby edge. Amber: the edge had to fetch from Virginia.', 'Hit ratio climbs as edges warm up. Popular objects are requested often, so they stay cached.', 'Short TTL = fresher content but more misses. Long TTL = fast and cheap, but changes take longer to appear — unless you invalidate.'],
     demo: ['Watch warm-up → Invalidate all caches → TTL 4 s → catalog 5000 + skew 0.5 → CDN off.'],
-    ask: 'Pixelpost updates a user\'s avatar but the old one keeps showing. What happened, and what are two fixes?',
+    ask: 'Spiron updates a user\'s avatar but the old one keeps showing. What happened, and what are two fixes?',
     answer: 'The edge serves a cached copy until the TTL expires. Fix: version the URL (avatar-v2.jpg) or invalidate the path; use short TTLs for frequently changing objects.',
     transition: 'Caches absorb reads. What absorbs bursts of work? Queues.'
   },
@@ -5088,7 +5087,7 @@ scene({
   html: `
   <div class="split" style="grid-template-columns:minmax(290px,0.9fr) minmax(0,2.1fr)">
     <div class="rail">
-      <p class="lede">Pixelpost resizes every uploaded photo. Instead of making uploads wait, the upload service drops a message on a queue (<span class="pv aws">SQS</span>, <span class="pv azure">Service Bus</span>, <span class="pv gcp">Pub/Sub</span>) and workers process it when they can.</p>
+      <p class="lede">Spiron resizes every uploaded photo. Instead of making uploads wait, the upload service drops a message on a queue (<span class="pv aws">SQS</span>, <span class="pv azure">Service Bus</span>, <span class="pv gcp">Pub/Sub</span>) and workers process it when they can.</p>
       <div id="mode"></div>
       <div class="controls stack" id="ctl"></div>
       <div class="tiles" id="tiles"></div>
